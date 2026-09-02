@@ -9,7 +9,7 @@ toggle.addEventListener("change", () => {
 });
 
 const version = chrome.runtime.getManifest().version;
-document.getElementById("version").textContent = "Versione " + version;
+document.getElementById("version").textContent = "Version " + version;
 
 const addDomain = document.getElementById("add-domain");
 const domainStatus = document.getElementById("domain-status");
@@ -35,20 +35,20 @@ async function currentTab() {
 
 async function updateDomainState() {
   const tab = await currentTab();
-  if (!tab || !tab.url) throw new Error("Scheda corrente non disponibile.");
+  if (!tab || !tab.url) throw new Error("Tab unavailable.");
 
   const url = new URL(tab.url);
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     addDomain.disabled = true;
-    domainStatus.textContent = "Apri prima il nuovo sito AnimeWorld.";
+    domainStatus.textContent = "Open AnimeWorld first.";
     return;
   }
 
   addDomain.dataset.hostname = url.hostname;
   if (isAutomaticDomain(url.hostname)) {
     addDomain.disabled = true;
-    addDomain.textContent = "Dominio riconosciuto";
-    domainStatus.textContent = "Attivazione automatica: " + url.hostname;
+    addDomain.textContent = "Domain detected";
+    domainStatus.textContent = url.hostname;
     return;
   }
 
@@ -67,8 +67,8 @@ async function updateDomainState() {
     }]);
   }
   addDomain.disabled = existing.length > 0;
-  addDomain.textContent = existing.length > 0 ? "Dominio già aggiunto" : "Aggiungi questo dominio";
-  domainStatus.textContent = "Dominio: " + url.hostname;
+  addDomain.textContent = existing.length > 0 ? "Domain added" : "Add this domain";
+  domainStatus.textContent = url.hostname;
 }
 
 addDomain.addEventListener("click", async () => {
@@ -76,14 +76,14 @@ addDomain.addEventListener("click", async () => {
   if (!hostname) return;
 
   addDomain.disabled = true;
-  domainStatus.textContent = "Richiesta autorizzazione…";
+  domainStatus.textContent = "Requesting access…";
 
   try {
     const pattern = domainPattern(hostname);
     const granted = await chrome.permissions.request({ origins: [pattern] });
     if (!granted) {
       addDomain.disabled = false;
-      domainStatus.textContent = "Autorizzazione non concessa.";
+      domainStatus.textContent = "Access denied.";
       return;
     }
 
@@ -116,11 +116,11 @@ addDomain.addEventListener("click", async () => {
       });
     }
 
-    addDomain.textContent = "Dominio aggiunto";
-    domainStatus.textContent = "Attivo ora e ai prossimi avvii.";
+    addDomain.textContent = "Domain added";
+    domainStatus.textContent = "Active now.";
   } catch (error) {
     addDomain.disabled = false;
-    domainStatus.textContent = "Errore: " + error.message;
+    domainStatus.textContent = "Error: " + error.message;
   }
 });
 
