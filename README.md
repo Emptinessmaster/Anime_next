@@ -1,91 +1,74 @@
 # AnimeWorld Auto Next
 
-Estensione per Brave (e Chrome) che, quando l'episodio in riproduzione finisce,
-passa automaticamente all'episodio successivo su AnimeWorld.
+Brave (and Chrome) extension that automatically plays the next AnimeWorld
+episode when the current one ends.
 
-## Come funziona
+## How it works
 
-- Rileva la fine del video (evento `ended`, con fallback quando mancano meno di
-  ~0,6 secondi alla fine, utile per i player HLS). Funziona **anche a schermo
-  intero**.
-- Trova il link dell'episodio successivo nella lista (`.episodes a`) e ci
-  naviga. Se non lo trova, clicca il pulsante **Successivo** del sito.
-- Sulla nuova pagina **avvia in automatico** la riproduzione del nuovo episodio.
-- Aggiunge sul player il pulsante **⛶** dell'estensione. Questo mette a schermo
-  intero il contenitore stabile `#player`, che resta attivo anche quando il sito
-  sostituisce l'iframe durante il cambio episodio.
-- Se sei all'ultimo episodio, non fa nulla (te lo segnala con un avviso).
+- Detects when the video ends (`ended` event, with a fallback for the final
+  ~0.6 seconds, useful with HLS players), including in **fullscreen**.
+- Opens the next link in `.episodes a`, or clicks the site's **Next** button.
+- Automatically starts playback on the new episode.
+- Adds a **⛶** button that makes the stable `#player` container fullscreen, so
+  fullscreen survives iframe replacement.
+- Shows a notice and stops when there is no next episode.
 
-## Come avviene il cambio episodio
+## Episode switching
 
-AnimeWorld cambia episodio **senza ricaricare la pagina** (AJAX) e carica il
-player dentro un `<iframe>`. L'estensione quindi:
+AnimeWorld switches episodes **without reloading the page** (AJAX) and loads the
+player inside an `<iframe>`. The extension therefore:
 
-- gira anche dentro l'iframe del player (per rilevare la fine e avviare il nuovo
-  video lì dentro);
-- fa cliccare al sito il link dell'episodio successivo (cambio "sul posto");
-- chiede al nuovo iframe di avviare la riproduzione;
-- mantiene il fullscreen sul contenitore `#player`, senza richieste periodiche
-  che il browser bloccherebbe in assenza di un gesto utente.
+- runs inside the player iframe to detect the end and start the next video;
+- activates the site's next-episode link in place;
+- asks the new iframe to start playback;
+- keeps `#player` fullscreen without repeated browser-blocked requests.
 
-## Nota importante su autoplay e schermo intero
+## Autoplay and fullscreen limitations
 
-I browser (Brave/Chrome inclusi) **bloccano per policy** l'avvio automatico e
-soprattutto l'ingresso a schermo intero se non c'è un'interazione dell'utente.
-Il passaggio all'episodio successivo scatta alla *fine* del video, che non conta
-come "gesto utente". Per questo l'estensione usa il seguente flusso:
+Browsers, including Brave and Chrome, **block autoplay and fullscreen** without
+a user gesture. Reaching the end of a video does not count as one. Therefore:
 
-- **Avvio del video**: nella maggior parte dei casi parte da solo. Se il browser
-  lo blocca, basta un clic qualsiasi sulla pagina e parte subito.
-- **Schermo intero**: usa il pulsante **⛶** aggiunto nell'angolo inferiore
-  destro del player. Il gesto mette direttamente in fullscreen `#player`, non
-  l'iframe destinato a essere rimosso. Il fullscreen sopravvive quindi allo swap
-  AJAX. La richiesta parte sempre dal clic diretto sul pulsante **⛶**, così
-  Brave la riconosce correttamente come gesto dell'utente.
-- **Player cross-origin**: il browser non permette allo script interno di
-  trasferire il gesto al documento principale. Il pulsante **⛶** in overlay è
-  il percorso affidabile anche in questo caso.
+- **Playback:** usually starts automatically. If blocked, click anywhere on the
+  page once.
+- **Fullscreen:** use the **⛶** button in the player's lower-right corner. It
+  makes `#player`, rather than the replaceable iframe, fullscreen.
+- **Cross-origin players:** browsers cannot transfer a gesture from the inner
+  player to the main document, so the **⛶** overlay is the reliable option.
 
-Se il fullscreen era stato avviato dal controllo nativo di un player
-cross-origin, la rimozione dell'iframe lo chiude. L'avviso chiede allora di
-premere **⛶**: questa singola interazione è obbligatoria per policy del browser.
+If fullscreen was started through a cross-origin player's native control,
+replacing its iframe closes it. Press **⛶** once to restore it.
 
-## Se il nuovo video non parte da solo
+## If the next video does not start
 
-Può succedere se l'iframe del player è su un dominio non incluso nell'estensione
-(così lo script non può avviarlo da dentro). Per verificarlo: tasto destro sul
-player → «Questo frame» / «Visualizza sorgente frame», guarda il dominio nella
-barra. Poi aggiungi quel dominio all'elenco `matches` in `manifest.json`
-(es. `"*://*.NOMEDOMINIO/*"`) e ricarica l'estensione. Scrivimelo e lo aggiungo.
+The player iframe may use a domain not included in the extension. Right-click
+the player, open its frame or frame source, note the domain, add it to `matches`
+in `manifest.json` (for example, `"*://*.DOMAIN/*"`), then reload the extension.
 
-## Installazione su Brave
+## Install on Brave
 
-1. Apri `brave://extensions` (scrivilo nella barra degli indirizzi).
-2. In alto a destra attiva **Modalità sviluppatore**.
-3. Clicca **Carica estensione non pacchettizzata**.
-4. Seleziona questa cartella (quella che contiene `manifest.json`).
-5. Apri una pagina di riproduzione di AnimeWorld: l'estensione è attiva.
+1. Open `brave://extensions`.
+2. Enable **Developer mode**.
+3. Click **Load unpacked**.
+4. Select the folder containing `manifest.json`.
+5. Open an AnimeWorld episode page.
 
-Puoi attivarla/disattivarla dall'icona dell'estensione nella barra degli
-strumenti (popup con l'interruttore). Se AnimeWorld cambia dominio, apri il
-nuovo sito con un nome differente, premi l'icona e scegli **Aggiungi questo
-dominio**. Il dominio viene mantenuto attivo ai prossimi avvii.
-I domini nel formato `animeworld.NUOVA_ESTENSIONE` (per esempio `.com` o `.it`)
-vengono invece riconosciuti e attivati automaticamente, senza usare il pulsante.
+Use the toolbar icon to enable or disable the extension. If AnimeWorld changes
+to a completely different name, open it and select **Add this domain**. Domains
+matching `animeworld.NEW_TLD`, such as `.com` or `.it`, are detected
+automatically.
 
-Per poter riconoscere anche estensioni di dominio non ancora note, Brave indica
-che l'estensione può leggere le pagine visitate. Lo script si arresta subito su
-ogni hostname che non corrisponde ad AnimeWorld o a un dominio aggiunto a mano.
+Brave reports that the extension can read visited pages because detecting
+unknown TLDs requires broad matching. The script exits immediately on hosts
+that are neither AnimeWorld nor manually added.
 
-## Domini supportati
+## Supported domains
 
-Sono già inclusi i domini AnimeWorld più comuni (`.ac`, `.cc`, `.tv`, `.so`,
-`.biz`, `.io`, `.me`). I domini aggiunti dal popup vengono registrati
-localmente nel browser e non richiedono modifiche a `manifest.json`.
+Common AnimeWorld domains (`.ac`, `.cc`, `.tv`, `.so`, `.biz`, `.io`, `.me`)
+are supported. Domains added from the popup are stored locally and require no
+changes to `manifest.json`.
 
-## Note
+## Notes
 
-- Nessuna icona personalizzata inclusa (non serve per il caricamento manuale):
-  Brave userà un'icona generica.
-- L'estensione non raccoglie né invia alcun dato; salva solo lo stato
-  attivo/disattivo in locale.
+- No custom icon is included; Brave uses a generic one.
+- The extension collects and sends no data. Only the enabled/disabled state is
+  stored locally.
