@@ -66,6 +66,25 @@
         margin: 12px 0 0;
         line-height: 1.4;
       }
+      button {
+        width: 100%;
+        margin-top: 14px;
+        padding: 9px 10px;
+        border: 0;
+        border-radius: 6px;
+        background: #3578e5;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button:disabled {
+        background: #55606e;
+        cursor: default;
+      }
+      #domain-status {
+        min-height: 17px;
+        margin-top: 7px;
+      }
     </style>
   </head>
   <body>
@@ -81,6 +100,8 @@
       Quando l'episodio finisce, passa da solo al successivo. Funziona sulle
       pagine di riproduzione di AnimeWorld.
     </p>
+    <button type="button" id="add-domain">Aggiungi questo dominio</button>
+    <p id="domain-status" role="status" aria-live="polite"></p>
     <p id="version" style="color: #6b7684; margin-top: 8px"></p>
     <script src="popup.js"></script>
   </body>

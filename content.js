@@ -2,6 +2,24 @@
 (function () {
   "use strict";
 
+  function isAutomaticAnimeWorldDomain() {
+    const hosts = [window.location.hostname];
+    try {
+      Array.from(window.location.ancestorOrigins || []).forEach(function (origin) {
+        hosts.push(new URL(origin).hostname);
+      });
+    } catch (_) {}
+
+    return hosts.some(function (hostname) {
+      return /^(?:[a-z0-9-]+\.)*animeworld\.[a-z0-9-]{2,24}$/i.test(hostname) ||
+        /^(?:[a-z0-9-]+\.)*animeworlditalia\.com$/i.test(hostname);
+    });
+  }
+
+  if (!window.__awManualDomain && !isAutomaticAnimeWorldDomain()) return;
+  if (window.__awAutoNextLoaded) return;
+  window.__awAutoNextLoaded = true;
+
   const CHANNEL = "AW_AUTO_NEXT_V2";
   const MESSAGE = Object.freeze({ ENDED: "ended", PLAY: "play", PLAYING: "playing" });
   const END_TOLERANCE = 0.75;

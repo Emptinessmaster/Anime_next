@@ -67,19 +67,21 @@ barra. Poi aggiungi quel dominio all'elenco `matches` in `manifest.json`
 5. Apri una pagina di riproduzione di AnimeWorld: l'estensione è attiva.
 
 Puoi attivarla/disattivarla dall'icona dell'estensione nella barra degli
-strumenti (popup con l'interruttore).
+strumenti (popup con l'interruttore). Se AnimeWorld cambia dominio, apri il
+nuovo sito con un nome differente, premi l'icona e scegli **Aggiungi questo
+dominio**. Il dominio viene mantenuto attivo ai prossimi avvii.
+I domini nel formato `animeworld.NUOVA_ESTENSIONE` (per esempio `.com` o `.it`)
+vengono invece riconosciuti e attivati automaticamente, senza usare il pulsante.
+
+Per poter riconoscere anche estensioni di dominio non ancora note, Brave indica
+che l'estensione può leggere le pagine visitate. Lo script si arresta subito su
+ogni hostname che non corrisponde ad AnimeWorld o a un dominio aggiunto a mano.
 
 ## Domini supportati
 
 Sono già inclusi i domini AnimeWorld più comuni (`.ac`, `.cc`, `.tv`, `.so`,
-`.biz`, `.io`, `.me`). Se AnimeWorld cambia dominio, aggiungi la nuova voce
-nell'elenco `matches` dentro `manifest.json`, ad esempio:
-
-```json
-"*://*.animeworld.NUOVODOMINIO/*"
-```
-
-poi ricarica l'estensione da `brave://extensions`.
+`.biz`, `.io`, `.me`). I domini aggiunti dal popup vengono registrati
+localmente nel browser e non richiedono modifiche a `manifest.json`.
 
 ## Note
 
