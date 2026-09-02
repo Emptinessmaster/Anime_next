@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "AnimeWorld Auto Next",
+  "version": "2.0.1",
+  "description": "Passa automaticamente all'episodio successivo quando finisce quello attuale su AnimeWorld.",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.animeworld.ac/*",
+        "*://*.animeworld.cc/*",
+        "*://*.animeworld.tv/*",
+        "*://*.animeworld.so/*",
+        "*://*.animeworld.biz/*",
+        "*://*.animeworld.io/*",
+        "*://*.animeworld.me/*",
+        "*://*.animeworlditalia.com/*"
+      ],
+      "all_frames": true,
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "AnimeWorld Auto Next",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["storage"]
+}
